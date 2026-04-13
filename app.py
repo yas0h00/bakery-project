@@ -21,7 +21,7 @@ if not app.secret_key:
     app.secret_key = secrets.token_hex(32)   # dev-only ephemeral key
 
 # ── Database ──────────────────────────────────────────────────────
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///bakery.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # ── Mail (Gmail SMTP) ─────────────────────────────────────────────
