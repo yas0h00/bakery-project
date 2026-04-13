@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ page }} — SwirlNSprinkle Bakery{% endblock %}
+
+{% block content %}
+<section class="about-hero" style="background:var(--g-coffee);padding:6rem 0 4rem;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(192,98,42,.06) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;"></div>
+  <div class="container position-relative" style="z-index:2;">
+    <span class="section-label mb-3 d-block">Legal</span>
+    <h1 class="about-hero-title">{{ page }}</h1>
+  </div>
+</section>
+
+<section class="py-section" style="background:var(--g-parchment);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="SwirlNSprinkle-divider mb-4"></div>
+        <p class="lh-relaxed" style="color:var(--g-text-mid);font-size:1.05rem;">{{ content }}</p>
+        <a href="{{ url_for('index') }}" class="hero-btn-primary mt-5 d-inline-block">← Back to Home</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

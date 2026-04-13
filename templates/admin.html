@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — SwirlNSprinkle Bakery</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g-ink:#100d07; --g-espresso:#1e140a; --g-coffee:#2d1c0d;
+  --g-terra:#c0622a; --g-amber:#e08a3c; --g-blush:#f4c8a4;
+  --g-parchment:#faf3e8; --g-cream:#f5ead8; --g-cream-dark:#ecdec8;
+  --g-white:#fefcf9; --g-text:#1e140a; --g-text-mid:#5c3a1e;
+  --g-text-muted:#9d7a5a;
+  --ff-display:'Playfair Display',Georgia,serif;
+  --ff-body:'DM Sans','Helvetica Neue',Arial,sans-serif;
+  --sidebar-w:230px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;}
+body{font-family:var(--ff-body);background:#f2ebe0;color:var(--g-text);display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────── */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--g-espresso);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;
+}
+.sidebar-brand{
+  padding:1.8rem 1.6rem 1.4rem;
+  border-bottom:1px solid rgba(192,98,42,.15);
+}
+.sidebar-brand-name{
+  font-family:var(--ff-display);font-size:1.9rem;color:var(--g-cream);line-height:1;
+}
+.sidebar-brand-name em{color:var(--g-terra);}
+.sidebar-brand-sub{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,234,216,.35);margin-top:.25rem;}
+nav.sidebar-nav{flex:1;padding:1rem 0;}
+.nav-section{
+  font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(245,234,216,.3);padding:.7rem 1.6rem .3rem;
+}
+.sidebar-link{
+  display:flex;align-items:center;gap:.8rem;
+  padding:.65rem 1.6rem;
+  color:rgba(245,234,216,.55);font-size:.84rem;font-weight:500;
+  text-decoration:none;
+  transition:background .2s,color .2s;
+  border-left:2px solid transparent;
+}
+.sidebar-link:hover,.sidebar-link.active{
+  background:rgba(192,98,42,.1);color:var(--g-cream);
+  border-left-color:var(--g-terra);
+}
+.sidebar-link .icon{font-size:1rem;width:1.2rem;text-align:center;}
+.sidebar-footer{
+  padding:1rem 1.6rem;border-top:1px solid rgba(192,98,42,.15);
+}
+.sidebar-footer a{
+  display:block;font-size:.75rem;color:rgba(245,234,216,.35);
+  text-decoration:none;margin-bottom:.3rem;transition:color .2s;
+}
+.sidebar-footer a:hover{color:var(--g-terra);}
+
+/* ── MAIN CONTENT ────────────────────────────────────────────── */
+.main{margin-left:var(--sidebar-w);flex:1;min-width:0;}
+.topbar{
+  background:var(--g-white);border-bottom:1px solid var(--g-cream-dark);
+  padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.topbar-title{font-family:var(--ff-display);font-size:1.2rem;color:var(--g-espresso);}
+.topbar-date{font-size:.78rem;color:var(--g-text-muted);}
+.content{padding:2rem;}
+
+/* ── STAT CARDS ──────────────────────────────────────────────── */
+.stat-card{
+  background:var(--g-white);border:1px solid var(--g-cream-dark);
+  padding:1.4rem 1.6rem;height:100%;
+}
+.stat-card-label{
+  font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--g-terra);font-weight:600;margin-bottom:.5rem;
+}
+.stat-card-value{
+  font-family:var(--ff-display);font-size:2.2rem;font-weight:700;
+  color:var(--g-espresso);line-height:1;
+}
+.stat-card-sub{font-size:.78rem;color:var(--g-text-muted);margin-top:.4rem;}
+.stat-card.accent{background:var(--g-espresso);}
+.stat-card.accent .stat-card-label{color:var(--g-amber);}
+.stat-card.accent .stat-card-value{color:var(--g-cream);}
+.stat-card.accent .stat-card-sub{color:rgba(245,234,216,.4);}
+
+/* ── SECTION HEADER ──────────────────────────────────────────── */
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.2rem;
+  padding-bottom:.8rem;
+  border-bottom:2px solid var(--g-terra);
+}
+.section-head h2{
+  font-family:var(--ff-display);font-size:1.4rem;color:var(--g-espresso);
+}
+
+/* ── ORDERS TABLE ────────────────────────────────────────────── */
+.orders-table{width:100%;border-collapse:collapse;font-size:.85rem;}
+.orders-table th{
+  background:var(--g-espresso);color:var(--g-cream);
+  font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:600;font-family:var(--ff-body);
+  padding:.75rem 1rem;text-align:left;
+}
+.orders-table td{
+  padding:.75rem 1rem;border-bottom:1px solid var(--g-cream-dark);
+  color:var(--g-text-mid);vertical-align:middle;
+}
+.orders-table tr:last-child td{border-bottom:none;}
+.orders-table tr:hover td{background:var(--g-parchment);}
+.order-id{font-family:var(--ff-display);font-weight:700;color:var(--g-terra);}
+.status-badge{
+  display:inline-block;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:700;padding:.25rem .6rem;border-radius:2px;
+}
+.status-pending  {background:rgba(224,138,60,.15);color:#b86a1a;}
+.status-ready    {background:rgba(76,175,80,.12);color:#2e7d32;}
+.status-collected{background:rgba(92,51,22,.1);color:var(--g-text-muted);}
+.status-cancelled{background:rgba(211,47,47,.1);color:#c62828;}
+.status-form select{
+  font-size:.72rem;padding:.2rem .5rem;
+  border:1px solid rgba(92,51,22,.2);background:var(--g-parchment);
+  color:var(--g-text);border-radius:2px;cursor:pointer;
+}
+
+/* ── MENU EDITOR ─────────────────────────────────────────────── */
+.menu-table{width:100%;border-collapse:collapse;font-size:.84rem;}
+.menu-table th{
+  background:var(--g-coffee);color:var(--g-cream);
+  font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:600;padding:.65rem 1rem;text-align:left;
+}
+.menu-table td{
+  padding:.65rem 1rem;border-bottom:1px solid var(--g-cream-dark);
+  color:var(--g-text-mid);vertical-align:middle;
+}
+.menu-table tr:last-child td{border-bottom:none;}
+.menu-table tr:hover td{background:var(--g-parchment);}
+.cat-badge{
+  display:inline-block;font-size:.58rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:.18rem .55rem;border-radius:2px;
+  background:rgba(192,98,42,.12);color:var(--g-terra);
+}
+
+/* ── FORMS (admin) ───────────────────────────────────────────── */
+.a-label{
+  display:block;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--g-terra);font-weight:600;margin-bottom:.3rem;
+}
+.a-input{
+  width:100%;background:var(--g-parchment);
+  border:1px solid rgba(92,51,22,.18);border-radius:2px;
+  color:var(--g-text);font-family:var(--ff-body);font-size:.88rem;
+  padding:.6rem .9rem;transition:border-color .2s;
+}
+.a-input:focus{outline:none;border-color:var(--g-terra);}
+select.a-input{cursor:pointer;}
+textarea.a-input{resize:vertical;min-height:75px;}
+
+/* ── BUTTONS ─────────────────────────────────────────────────── */
+.btn-primary-sm{
+  background:var(--g-terra);color:var(--g-white);border:none;
+  font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  padding:.55rem 1.2rem;cursor:pointer;border-radius:2px;
+  transition:background .2s,transform .15s;text-decoration:none;display:inline-block;
+}
+.btn-primary-sm:hover{background:var(--g-amber);color:var(--g-ink);transform:translateY(-1px);}
+.btn-ghost-sm{
+  background:transparent;color:var(--g-terra);
+  border:1px solid rgba(192,98,42,.3);font-size:.7rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;padding:.5rem 1rem;
+  cursor:pointer;border-radius:2px;transition:background .2s,color .2s;
+  text-decoration:none;display:inline-block;
+}
+.btn-ghost-sm:hover{background:var(--g-terra);color:var(--g-white);}
+.btn-danger-sm{
+  background:transparent;color:#c62828;border:1px solid rgba(198,40,40,.25);
+  font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:.45rem .9rem;cursor:pointer;border-radius:2px;transition:background .2s,color .2s;
+}
+.btn-danger-sm:hover{background:#c62828;color:#fff;}
+
+/* ── MODAL ───────────────────────────────────────────────────── */
+.modal-backdrop-custom{
+  display:none;position:fixed;inset:0;background:rgba(16,13,7,.5);z-index:1000;
+  align-items:center;justify-content:center;
+}
+.modal-backdrop-custom.open{display:flex;}
+.modal-box{
+  background:var(--g-white);width:100%;max-width:520px;max-height:90vh;
+  overflow-y:auto;padding:2rem;position:relative;
+  box-shadow:0 32px 80px rgba(0,0,0,.3);
+}
+.modal-title{
+  font-family:var(--ff-display);font-size:1.3rem;color:var(--g-espresso);
+  margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:1px solid var(--g-cream-dark);
+}
+.modal-close{
+  position:absolute;top:1rem;right:1rem;background:none;border:none;
+  font-size:1.4rem;cursor:pointer;color:var(--g-text-muted);line-height:1;
+}
+.modal-close:hover{color:var(--g-terra);}
+
+/* ── MISC ────────────────────────────────────────────────────── */
+.panel{background:var(--g-white);border:1px solid var(--g-cream-dark);padding:1.6rem;}
+.no-orders{
+  text-align:center;padding:3rem 1rem;color:var(--g-text-muted);
+  font-size:.9rem;
+}
+.no-orders .big-emoji{font-size:3rem;display:block;margin-bottom:.8rem;}
+.flash-alert{
+  border-radius:0;border-left:3px solid var(--g-terra);
+  margin-bottom:1.2rem;font-size:.87rem;
+}
+.items-cell{max-width:220px;font-size:.8rem;line-height:1.6;color:var(--g-text-muted);}
+.toggle-active{
+  width:36px;height:20px;background:var(--g-cream-dark);
+  border:none;border-radius:10px;cursor:pointer;position:relative;transition:background .2s;
+}
+.toggle-active.on{background:var(--g-terra);}
+.toggle-active::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:14px;height:14px;border-radius:50%;background:white;transition:left .2s;
+}
+.toggle-active.on::after{left:19px;}
+
+@media(max-width:900px){
+  .sidebar{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;}
+  .main{margin-left:0;}
+  .sidebar-nav{display:flex;flex-wrap:wrap;padding:.4rem;}
+  .sidebar-link{padding:.45rem .9rem;font-size:.75rem;}
+  .content{padding:1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ───────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-name">Swirl &<em>Sprinkle</em></div>
+    <div class="sidebar-brand-sub">Admin Panel</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Overview</div>
+    <a href="#dashboard" class="sidebar-link active"><span class="icon">📊</span> Dashboard</a>
+    <a href="#orders"    class="sidebar-link"><span class="icon">🧾</span> Today's Orders</a>
+    <div class="nav-section">Manage</div>
+    <a href="#menu"     class="sidebar-link"><span class="icon">🥐</span> Menu Editor</a>
+    <a href="#location" class="sidebar-link"><span class="icon">📍</span> Location</a>
+    <div class="nav-section">Reports</div>
+    <a href="#messages" class="sidebar-link"><span class="icon">✉️</span> Messages</a>
+    <a href="#reviews"  class="sidebar-link"><span class="icon">⭐</span> Reviews</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="{{ url_for('index') }}" target="_blank">← View Bakery Site</a>
+    <a href="{{ url_for('admin_logout') }}">Sign Out</a>
+  </div>
+</aside>
+
+<!-- ── MAIN ──────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title">Good morning, Chef 👋</div>
+    <div class="topbar-date">{{ today.strftime('%A, %d %B %Y') }}</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }} flash-alert">{{ msg }}</div>
+      {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- ════════════════════════════════════════════
+         STATS
+    ═══════════════════════════════════════════════ -->
+    <div id="dashboard" class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="stat-card accent">
+          <div class="stat-card-label">Today's Revenue</div>
+          <div class="stat-card-value">₹{{ "%.0f"|format(today_revenue) }}</div>
+          <div class="stat-card-sub">{{ today_count }} order{{ 's' if today_count != 1 }}</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-card-label">All-Time Revenue</div>
+          <div class="stat-card-value">₹{{ "%.0f"|format(total_rev) }}</div>
+          <div class="stat-card-sub">{{ total_orders }} total orders</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-card-label">Subscribers</div>
+          <div class="stat-card-value">{{ subscribers }}</div>
+          <div class="stat-card-sub">Newsletter list</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-card-label">Enquiries</div>
+          <div class="stat-card-value">{{ contacts }}</div>
+          <div class="stat-card-sub">Contact messages</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         TODAY'S ORDERS
+    ═══════════════════════════════════════════════ -->
+    <div id="orders" class="panel mb-4">
+      <div class="section-head">
+        <h2>Today's Orders</h2>
+        <span style="font-size:.78rem;color:var(--g-text-muted);">
+          {{ today.strftime('%d %b %Y') }} &nbsp;·&nbsp;
+          {{ today_count }} order{{ 's' if today_count != 1 }} &nbsp;·&nbsp;
+          <strong style="color:var(--g-terra);">₹{{ "%.0f"|format(today_revenue) }}</strong>
+        </span>
+      </div>
+
+      {% if today_orders %}
+      <div style="overflow-x:auto;">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in today_orders %}
+            <tr>
+              <td><span class="order-id">#{{ o.id }}</span></td>
+              <td>
+                <div style="font-weight:600;font-size:.88rem;color:var(--g-espresso);">{{ o.name }}</div>
+                <div style="font-size:.75rem;color:var(--g-text-muted);">{{ o.email }}</div>
+              </td>
+              <td><div class="items-cell">{{ o.items }}</div></td>
+              <td style="font-family:'Playfair Display',Georgia,serif;font-weight:700;color:var(--g-terra);">
+                ₹{{ "%.0f"|format(o.total) }}
+              </td>
+              <td style="font-size:.78rem;white-space:nowrap;">{{ o.created_at.strftime('%H:%M') }}</td>
+              <td>
+                <span class="status-badge status-{{ o.status }}">{{ o.status }}</span>
+              </td>
+              <td>
+                <form method="POST" action="{{ url_for('admin_order_status', order_id=o.id) }}"
+                      class="status-form d-flex gap-1 align-items-center">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <select name="status" class="a-input" style="padding:.3rem .5rem;font-size:.75rem;width:auto;">
+                    {% for s in ['pending','ready','collected','cancelled'] %}
+                    <option value="{{ s }}" {{ 'selected' if o.status == s }}>{{ s|capitalize }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn-primary-sm" style="padding:.4rem .7rem;letter-spacing:0;font-size:.72rem;">✓</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="no-orders">
+        <span class="big-emoji">🥐</span>
+        No orders yet today. The oven is warm and waiting!
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         MENU EDITOR
+    ═══════════════════════════════════════════════ -->
+    <div id="menu" class="panel mb-4">
+      <div class="section-head">
+        <h2>Menu Editor</h2>
+        <button class="btn-primary-sm" onclick="openAddModal()">+ Add Item</button>
+      </div>
+
+      <div id="menuTableWrap" style="overflow-x:auto;">
+        <table class="menu-table" id="menuTable">
+          <thead>
+            <tr>
+              <th>Icon</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Price</th>
+              <th>Badge</th>
+              <th>Active</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="menuTbody">
+            <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--g-text-muted);">Loading menu…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         LOCATION
+    ═══════════════════════════════════════════════ -->
+    <div id="location" class="panel mb-4">
+      <div class="section-head">
+        <h2>Location & Hours</h2>
+      </div>
+      <form method="POST" action="{{ url_for('admin_location_update') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="a-label">Store Name</label>
+            <input type="text" name="name" class="a-input"
+                   value="{{ location.name if location else 'SwirlNSprinkle Bakery' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="a-label">Phone</label>
+            <input type="text" name="phone" class="a-input"
+                   value="{{ location.phone if location else '' }}">
+          </div>
+          <div class="col-md-8">
+            <label class="a-label">Street Address</label>
+            <input type="text" name="address" class="a-input"
+                   value="{{ location.address if location else '' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="a-label">City / State / ZIP</label>
+            <input type="text" name="city" class="a-input"
+                   value="{{ location.city if location else '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="a-label">Email</label>
+            <input type="email" name="email" class="a-input"
+                   value="{{ location.email if location else '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="a-label">Google Maps URL</label>
+            <input type="url" name="maps_url" class="a-input"
+                   value="{{ location.maps_url if location else '' }}"
+                   placeholder="https://maps.google.com/?q=...">
+          </div>
+          <div class="col-md-4">
+            <label class="a-label">Hours Mon–Fri</label>
+            <input type="text" name="hours_mon_fri" class="a-input"
+                   value="{{ location.hours_mon_fri if location else '7:00 am – 4:00 pm' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="a-label">Hours Saturday</label>
+            <input type="text" name="hours_sat" class="a-input"
+                   value="{{ location.hours_sat if location else '7:00 am – 3:00 pm' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="a-label">Hours Sunday</label>
+            <input type="text" name="hours_sun" class="a-input"
+                   value="{{ location.hours_sun if location else '8:00 am – 2:00 pm' }}">
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn-primary-sm">Save Location →</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         RECENT MESSAGES
+    ═══════════════════════════════════════════════ -->
+    <div id="messages" class="panel mb-4">
+      <div class="section-head">
+        <h2>Recent Contact Messages</h2>
+        <span style="font-size:.78rem;color:var(--g-text-muted);">Latest 5</span>
+      </div>
+      {% if recent_msgs %}
+      <div style="overflow-x:auto;">
+        <table class="orders-table">
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Phone</th><th>Message</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            {% for m in recent_msgs %}
+            <tr>
+              <td style="font-weight:600;white-space:nowrap;">{{ m.first_name }} {{ m.last_name }}</td>
+              <td><a href="/cdn-cgi/l/email-protection#6e15154e03400b030f07024e1313" style="color:var(--g-terra);font-size:.82rem;">{{ m.email }}</a></td>
+              <td style="font-size:.82rem;white-space:nowrap;">{{ m.phone or '—' }}</td>
+              <td style="font-size:.82rem;max-width:260px;color:var(--g-text-muted);">
+                {{ m.message[:100] }}{{ '…' if m.message|length > 100 }}
+              </td>
+              <td style="font-size:.76rem;white-space:nowrap;color:var(--g-text-muted);">
+                {{ m.created_at.strftime('%d %b, %H:%M') }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="no-orders">
+        <span class="big-emoji">✉️</span>No messages yet.
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ════════════════════════════════════════
+         REVIEWS
+    ═════════════════════════════════════════ -->
+    <div id="reviews" class="panel mb-4">
+      <div class="section-head">
+        <h2>Customer Reviews</h2>
+        <span style="font-size:.78rem;color:var(--g-text-muted);">
+          {{ pending_reviews|length }} pending &nbsp;·&nbsp; {{ all_reviews|length }} live
+        </span>
+      </div>
+
+      {% if pending_reviews %}
+      <p style="font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--g-terra);font-weight:700;margin-bottom:.8rem;">⏳ Awaiting Approval</p>
+      <div style="overflow-x:auto;margin-bottom:2rem;">
+        <table class="orders-table">
+          <thead><tr><th>Order</th><th>Name</th><th>Stars</th><th>Comment</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for r in pending_reviews %}
+            <tr>
+              <td><span class="order-id">#{{ r.order_id }}</span></td>
+              <td style="font-weight:600;font-size:.88rem;color:var(--g-espresso);">{{ r.name }}</td>
+              <td><span style="color:#e08a3c;font-size:1rem;">{% for i in range(r.stars) %}★{% endfor %}{% for i in range(5-r.stars) %}<span style="color:var(--g-cream-dark);">★</span>{% endfor %}</span></td>
+              <td style="font-size:.82rem;max-width:260px;color:var(--g-text-muted);">{{ (r.comment or '—')[:120] }}{{ '…' if r.comment and r.comment|length > 120 }}</td>
+              <td style="font-size:.76rem;white-space:nowrap;color:var(--g-text-muted);">{{ r.created_at.strftime('%d %b, %H:%M') }}</td>
+              <td style="white-space:nowrap;">
+                <form method="POST" action="{{ url_for('admin_review_approve', review_id=r.id) }}" style="display:inline;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-primary-sm" style="padding:.35rem .8rem;">✓ Approve</button>
+                </form>
+                &nbsp;
+                <form method="POST" action="{{ url_for('admin_review_delete', review_id=r.id) }}" style="display:inline;" onsubmit="return confirm('Delete this review?')">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-danger-sm">✕ Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p style="font-size:.85rem;color:var(--g-text-muted);padding:.6rem 0 1.2rem;">No reviews pending — inbox is clear ✅</p>
+      {% endif %}
+
+      {% if all_reviews %}
+      <p style="font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--g-text-muted);font-weight:700;margin-bottom:.8rem;border-top:1px solid var(--g-cream-dark);padding-top:1.2rem;">✅ Live on Site</p>
+      <div style="overflow-x:auto;">
+        <table class="orders-table">
+          <thead><tr><th>Order</th><th>Name</th><th>Stars</th><th>Comment</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody>
+            {% for r in all_reviews %}
+            <tr>
+              <td><span class="order-id">#{{ r.order_id }}</span></td>
+              <td style="font-weight:600;font-size:.88rem;color:var(--g-espresso);">{{ r.name }}</td>
+              <td><span style="color:#e08a3c;font-size:1rem;">{% for i in range(r.stars) %}★{% endfor %}{% for i in range(5-r.stars) %}<span style="color:var(--g-cream-dark);">★</span>{% endfor %}</span></td>
+              <td style="font-size:.82rem;max-width:260px;color:var(--g-text-muted);">{{ (r.comment or '—')[:120] }}{{ '…' if r.comment and r.comment|length > 120 }}</td>
+              <td style="font-size:.76rem;white-space:nowrap;color:var(--g-text-muted);">{{ r.created_at.strftime('%d %b, %H:%M') }}</td>
+              <td>
+                <form method="POST" action="{{ url_for('admin_review_delete', review_id=r.id) }}" style="display:inline;" onsubmit="return confirm('Remove this review from the site?')">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-danger-sm">✕ Remove</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p style="font-size:.85rem;color:var(--g-text-muted);padding:.6rem 0;">No approved reviews yet — approve some above to show them on the homepage.</p>
+      {% endif %}
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ADD ITEM MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop-custom" id="addModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeAddModal()">×</button>
+    <div class="modal-title">Add Menu Item</div>
+    <div class="row g-3" id="addForm">
+      <div class="col-6">
+        <label class="a-label">Icon (emoji)</label>
+        <input type="text" id="add_icon" class="a-input" placeholder="🥐" value="🍞">
+      </div>
+      <div class="col-6">
+        <label class="a-label">Category</label>
+        <select id="add_category" class="a-input">
+          <option value="viennoiserie">Viennoiserie</option>
+          <option value="breads">Breads</option>
+          <option value="pastries">Pastries &amp; Cakes</option>
+          <option value="drinks">Drinks</option>
+        </select>
+      </div>
+      <div class="col-12">
+        <label class="a-label">Name *</label>
+        <input type="text" id="add_name" class="a-input" placeholder="Item name">
+      </div>
+      <div class="col-12">
+        <label class="a-label">Description</label>
+        <textarea id="add_desc" class="a-input" placeholder="Short description…"></textarea>
+      </div>
+      <div class="col-6">
+        <label class="a-label">Price ($) *</label>
+        <input type="number" id="add_price" class="a-input" step="0.01" min="0" placeholder="0.00">
+      </div>
+      <div class="col-6">
+        <label class="a-label">Badge (optional)</label>
+        <input type="text" id="add_badge" class="a-input" placeholder="Bestseller / New / GF…">
+      </div>
+      <div class="col-12">
+        <button class="btn-primary-sm" onclick="submitAddItem()">Add Item →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     EDIT ITEM MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop-custom" id="editModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeEditModal()">×</button>
+    <div class="modal-title">Edit Menu Item</div>
+    <input type="hidden" id="edit_id">
+    <div class="row g-3">
+      <div class="col-6">
+        <label class="a-label">Icon</label>
+        <input type="text" id="edit_icon" class="a-input">
+      </div>
+      <div class="col-6">
+        <label class="a-label">Category</label>
+        <select id="edit_category" class="a-input">
+          <option value="viennoiserie">Viennoiserie</option>
+          <option value="breads">Breads</option>
+          <option value="pastries">Pastries &amp; Cakes</option>
+          <option value="drinks">Drinks</option>
+        </select>
+      </div>
+      <div class="col-12">
+        <label class="a-label">Name</label>
+        <input type="text" id="edit_name" class="a-input">
+      </div>
+      <div class="col-12">
+        <label class="a-label">Description</label>
+        <textarea id="edit_desc" class="a-input"></textarea>
+      </div>
+      <div class="col-6">
+        <label class="a-label">Price ($)</label>
+        <input type="number" id="edit_price" class="a-input" step="0.01" min="0">
+      </div>
+      <div class="col-6">
+        <label class="a-label">Badge</label>
+        <input type="text" id="edit_badge" class="a-input">
+      </div>
+      <div class="col-12">
+        <label class="a-label" style="display:inline-flex;align-items:center;gap:.6rem;cursor:pointer;">
+          <input type="checkbox" id="edit_active" style="width:16px;height:16px;accent-color:var(--g-terra);">
+          Active (visible on menu)
+        </label>
+      </div>
+      <div class="col-12">
+        <button class="btn-primary-sm" onclick="submitEditItem()">Save Changes →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── CSRF TOKEN ────────────────────────────────────────────────
+const CSRF = "{{ csrf_token() }}";
+
+// ── MENU TABLE ────────────────────────────────────────────────
+async function loadMenu() {
+  const resp = await fetch("{{ url_for('admin_menu_items') }}");
+  const items = await resp.json();
+  const tbody = document.getElementById("menuTbody");
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--g-text-muted);">No menu items found.</td></tr>';
+    return;
+  }
+  const catLabel = {viennoiserie:"Viennoiserie",breads:"Breads",pastries:"Pastries",drinks:"Drinks"};
+  tbody.innerHTML = items.map(i => `
+    <tr id="row-${i.id}">
+      <td style="font-size:1.4rem;">${i.icon}</td>
+      <td style="font-weight:600;font-size:.88rem;color:var(--g-espresso);">${escHtml(i.name)}</td>
+      <td><span class="cat-badge">${catLabel[i.category]||i.category}</span></td>
+      <td style="font-size:.8rem;color:var(--g-text-muted);max-width:200px;">${escHtml(i.desc||'')}</td>
+      <td style="font-family:'Playfair Display',Georgia,serif;font-weight:700;color:var(--g-terra);">₹${Math.round(parseFloat(i.price))}</td>
+      <td>${i.badge ? `<span style="font-size:.6rem;background:rgba(192,98,42,.12);color:var(--g-terra);padding:.15rem .5rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;">${escHtml(i.badge)}</span>` : '<span style="color:var(--g-text-muted);font-size:.78rem;">—</span>'}</td>
+      <td><button class="toggle-active ${i.active ? 'on' : ''}" onclick="toggleActive(${i.id},this)" title="${i.active?'Active — click to deactivate':'Inactive — click to activate'}"></button></td>
+      <td style="white-space:nowrap;">
+        <button class="btn-ghost-sm" onclick='openEditModal(${JSON.stringify(i)})'>Edit</button>
+        &nbsp;
+        <button class="btn-danger-sm" onclick="deleteItem(${i.id})">Del</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+async function toggleActive(id, btn) {
+  // Find current state from button
+  const isOn = btn.classList.contains('on');
+  const row = document.getElementById(`row-${id}`);
+  const nameEl = row.querySelector('td:nth-child(2)');
+  // Get current data
+  const resp = await fetch(`/admin/menu/edit/${id}`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      icon: row.cells[0].textContent.trim(),
+      name: nameEl.textContent.trim(),
+      active: !isOn,
+    })
+  });
+  if ((await resp.json()).ok) {
+    btn.classList.toggle('on');
+  }
+}
+
+async function deleteItem(id) {
+  if (!confirm('Delete this menu item? This cannot be undone.')) return;
+  const resp = await fetch(`/admin/menu/delete/${id}`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-CSRFToken':CSRF},
+    body: JSON.stringify({csrf_token: CSRF})
+  });
+  const data = await resp.json();
+  if (data.ok) {
+    document.getElementById(`row-${id}`)?.remove();
+  }
+}
+
+// ── ADD MODAL ─────────────────────────────────────────────────
+function openAddModal(){ document.getElementById('addModal').classList.add('open'); }
+function closeAddModal(){ document.getElementById('addModal').classList.remove('open'); }
+
+async function submitAddItem() {
+  const payload = {
+    icon:     document.getElementById('add_icon').value,
+    category: document.getElementById('add_category').value,
+    name:     document.getElementById('add_name').value,
+    desc:     document.getElementById('add_desc').value,
+    price:    document.getElementById('add_price').value,
+    badge:    document.getElementById('add_badge').value,
+    active:   true,
+    csrf_token: CSRF,
+  };
+  if (!payload.name || !payload.price) { alert('Name and price are required.'); return; }
+  const resp = await fetch('/admin/menu/add', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  const data = await resp.json();
+  if (data.ok) { closeAddModal(); loadMenu(); }
+}
+
+// ── EDIT MODAL ────────────────────────────────────────────────
+function openEditModal(item) {
+  document.getElementById('edit_id').value       = item.id;
+  document.getElementById('edit_icon').value     = item.icon;
+  document.getElementById('edit_category').value = item.category;
+  document.getElementById('edit_name').value     = item.name;
+  document.getElementById('edit_desc').value     = item.desc || '';
+  document.getElementById('edit_price').value    = item.price;
+  document.getElementById('edit_badge').value    = item.badge || '';
+  document.getElementById('edit_active').checked = item.active;
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEditModal(){ document.getElementById('editModal').classList.remove('open'); }
+
+async function submitEditItem() {
+  const id = document.getElementById('edit_id').value;
+  const payload = {
+    icon:     document.getElementById('edit_icon').value,
+    category: document.getElementById('edit_category').value,
+    name:     document.getElementById('edit_name').value,
+    desc:     document.getElementById('edit_desc').value,
+    price:    document.getElementById('edit_price').value,
+    badge:    document.getElementById('edit_badge').value,
+    active:   document.getElementById('edit_active').checked,
+    csrf_token: CSRF,
+  };
+  const resp = await fetch(`/admin/menu/edit/${id}`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  const data = await resp.json();
+  if (data.ok) { closeEditModal(); loadMenu(); }
+}
+
+// ── Close modals on backdrop click ───────────────────────────
+['addModal','editModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function(e){
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ── Sidebar smooth scroll ─────────────────────────────────────
+document.querySelectorAll('.sidebar-link[href^="#"]').forEach(link => {
+  link.addEventListener('click', function(e){
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) target.scrollIntoView({behavior:'smooth',block:'start'});
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// Init
+loadMenu();
+</script>
+
+</body>
+</html>

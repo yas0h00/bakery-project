@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}About — SwirlNSprinkle Bakery{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════════════════
+     ABOUT HERO
+══════════════════════════════════════════════════════════════ -->
+<section class="about-hero">
+  <div class="about-hero-bg"></div>
+  <div class="container position-relative" style="z-index:2;">
+    <div class="row">
+      <div class="col-lg-8">
+        <span class="section-label mb-4 d-block">Our Story</span>
+        <h1 class="about-hero-title mb-4">
+          Baked with Love,<br>&amp; <em>Sweet Purpose</em>
+        </h1>
+        <p class="lh-relaxed" style="color:var(--g-text-light);max-width:540px;font-size:1.05rem;">
+          Prajakta's kitchen is where passion meets purpose — homemade cupcakes
+          crafted with real ingredients, real care, and a whole lot of heart,
+          one sweet bite at a time.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     OUR STORY (body text + baker image)
+══════════════════════════════════════════════════════════════ -->
+<section class="py-section" style="background:var(--g-parchment);">
+  <div class="container">
+    <div class="row align-items-center g-5">
+
+      <div class="col-lg-5" data-gsap="fade-left">
+        <div class="story-img-frame">
+          <img src="{{ url_for('static', filename='images/wahini.png') }}"
+               alt="Baker at work"
+               onerror="this.style.minHeight='420px';this.style.background='var(--g-cream-dark)';this.removeAttribute('src')">
+        </div>
+      </div>
+
+      <div class="col-lg-6 offset-lg-1" data-gsap="fade-right">
+        <span class="section-label mb-3 d-block">A Legacy, Baked Fresh</span>
+        <div class="SwirlNSprinkle-divider mb-4"></div>
+        <h2 class="display-5 fw-bold mb-4">From Her Kitchen,<br>With Love</h2>
+        <p class="lh-relaxed mb-4" style="color:var(--g-text-mid);">
+          Prajakta is a devoted wife, a talented beautician, and now a passionate
+          home baker. Between her beauty clients and caring for her home, she found
+          her truest joy in the kitchen — baking cupcakes that made everyone around
+          her smile a little wider.
+        </p>
+        <p class="lh-relaxed mb-5" style="color:var(--g-text-mid);">
+          What began as a quiet way to support her family and stand by her husband
+          has blossomed into something beautiful. Every cupcake she bakes carries
+          the same warmth she puts into everything she does — made fresh, made from
+          scratch, made with purpose.
+        </p>
+        <a href="{{ url_for('menu') }}" class="hero-btn-primary">Explore the Menu &nbsp;→</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MEET THE TEAM  ← team images moved here from home
+══════════════════════════════════════════════════════════════ -->
+<section class="team-section py-section">
+  <div class="container">
+    <div class="text-center mb-5" data-gsap="fade-up">
+      <span class="section-label mb-3 d-block">The People</span>
+      <div class="SwirlNSprinkle-divider mx-auto mb-4"></div>
+      <h2 class="display-5 fw-bold">Meet Prajakta</h2>
+      <p class="mt-3 mx-auto lh-relaxed" style="max-width:480px;color:var(--g-text-mid);">
+        The heart and hands behind every cupcake — a woman who bakes with love,
+        purpose, and a frosting swirl that took years to perfect.
+      </p>
+    </div>
+
+    <div class="row g-4" data-gsap="stagger" data-stagger="0.14">
+
+      <!-- Prajakta -->
+      <div class="col-md-6 col-lg-5 offset-lg-1">
+        <div class="team-card">
+          <div style="overflow:hidden;">
+            <img src="{{ url_for('static', filename='images/cupcake1.png') }}"
+                 alt="Prajakta — Baker &amp; Founder"
+                 class="team-card-img"
+                 onerror="this.style.minHeight='380px';this.style.background='var(--g-cream-dark)';this.removeAttribute('src')">
+          </div>
+          <div class="team-card-body">
+            <h3 class="team-card-name">Prajakta</h3>
+            <p class="team-card-role">Home Baker &amp; Founder</p>
+            <p class="team-card-bio">
+              A devoted wife and skilled beautician who discovered her true calling
+              in the kitchen. Prajakta bakes every cupcake from scratch each morning,
+              pouring the same care and precision into her frosting as she does into
+              everything she loves.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prajakta's Specials -->
+      <div class="col-md-6 col-lg-5">
+        <div class="team-card" style="margin-top:3rem;">
+          <div style="overflow:hidden;">
+            <img src="{{ url_for('static', filename='images/cupcake2.png') }}"
+                 alt="Prajakta's Signature Cupcakes"
+                 class="team-card-img"
+                 onerror="this.style.minHeight='380px';this.style.background='var(--g-cream-dark)';this.removeAttribute('src')">
+          </div>
+          <div class="team-card-body">
+            <h3 class="team-card-name">Her Signature Flavours</h3>
+            <p class="team-card-role">Handcrafted &amp; Baked Fresh Daily</p>
+            <p class="team-card-bio">
+              From classic vanilla rose to rich salted caramel, every flavour on
+              the menu carries Prajakta's personal touch. Her seasonal specials
+              are where creativity shines — surprising combinations that keep
+              customers coming back for more.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     VALUES (dark section)
+══════════════════════════════════════════════════════════════ -->
+<section class="values-section py-section">
+  <div class="container">
+    <div class="text-center mb-5" data-gsap="fade-up">
+      <span class="section-label mb-3 d-block">What We Stand For</span>
+      <div class="SwirlNSprinkle-divider mx-auto mb-4"></div>
+      <h2 class="display-5 fw-bold" style="color:var(--g-cream);">Our Values</h2>
+    </div>
+
+    <div class="row g-4" data-gsap="stagger" data-stagger="0.1">
+      {% set vals = [
+        {"n":"01","title":"Honest Ingredients", "desc":"No shortcuts, no additives. Every ingredient is chosen for flavour and provenance, sourced from farms we trust."},
+        {"n":"02","title":"Time & Patience",    "desc":"Good bread cannot be rushed. We proof overnight, bake at dawn, and let natural fermentation do its magic."},
+        {"n":"03","title":"Community First",    "desc":"We are neighbours before we are a bakery. Every loaf sold supports local suppliers and the families behind them."},
+        {"n":"04","title":"Zero Waste",         "desc":"Day-old bread becomes croutons. Offcuts become crumbs. Nothing leaves our kitchen without purpose."},
+      ] %}
+      {% for v in vals %}
+      <div class="col-md-6 col-lg-3">
+        <div class="value-item h-100">
+          <div class="value-num">{{ v.n }}</div>
+          <h4 class="value-title">{{ v.title }}</h4>
+          <p class="value-desc mb-0">{{ v.desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     STATS BAR
+══════════════════════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="row text-center g-4" data-gsap="stagger" data-stagger="0.1">
+      <div class="col-6 col-md-3">
+        <span class="stat-num" data-count="3" data-suffix="">3</span>
+        <span class="stat-label">Generations of Recipes</span>
+      </div>
+      <div class="col-6 col-md-3">
+        <span class="stat-num">New</span>
+        <span class="stat-label">Recently Started, Already Loved</span>
+      </div>
+      <div class="col-6 col-md-3">
+        <span class="stat-num" data-count="100" data-suffix="%">100%</span>
+        <span class="stat-label">Local Ingredients</span>
+      </div>
+      <div class="col-6 col-md-3">
+        <span class="stat-num">Daily</span>
+        <span class="stat-label">Baked From Scratch</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CTA STRIP
+══════════════════════════════════════════════════════════════ -->
+<section class="py-section text-center" style="background:var(--g-cream);">
+  <div class="container" data-gsap="fade-up">
+    <h2 class="display-5 fw-bold mb-3">Come Say Hello</h2>
+    <p class="lh-relaxed mb-5 mx-auto" style="max-width:460px;color:var(--g-text-mid);">
+      The Mpire Township, Fursungi, Pune.<br>
+      Orders taken daily — baked fresh for you.
+    </p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{{ url_for('order') }}"   class="hero-btn-primary">Order Online &nbsp;→</a>
+      <a href="{{ url_for('contact') }}" class="hero-btn-outline">Get in Touch</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

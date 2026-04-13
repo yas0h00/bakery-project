@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Menu — SwirlNSprinkle Bakery{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════════════════
+     MENU HERO
+══════════════════════════════════════════════════════════════ -->
+<section class="menu-page-hero">
+  <div class="container position-relative" style="z-index:2;">
+    <span class="section-label mb-3 d-block">What We Bake</span>
+    <h1 class="about-hero-title" style="color:var(--g-cream);">
+      Our <em>Menu</em>
+    </h1>
+    <p class="lh-relaxed mt-3" style="color:var(--g-text-light);max-width:500px;">
+      Freshly baked &amp; 100% homemade. Eggless options available —
+      arrive early for the best selection.
+    </p>
+  </div>
+</section>
+
+<!-- marquee -->
+<div class="marquee-strip" aria-hidden="true">
+  <div class="marquee-track">
+    {% set items = ["Classic Cupcakes","White Topping","Red Velvet","Tutti Frutti","Signature Treats","Rasmalai Cake","Gulab Jamun Cake","Eggless"] %}
+    {% for item in items %}<span>{{ item }}</span>{% endfor %}
+    {% for item in items %}<span>{{ item }}</span>{% endfor %}
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CLASSIC CUPCAKES (PLAIN)
+══════════════════════════════════════════════════════════════ -->
+<section class="menu-cat-section" style="background:var(--g-parchment);">
+  <div class="container">
+
+    <div class="row align-items-end mb-4" data-gsap="fade-up">
+      <div class="col">
+        <h2 class="menu-cat-title">Classic Cupcakes (Plain)</h2>
+        <p class="menu-cat-desc">Light, fluffy, and perfect with tea/coffee.</p>
+        <div class="SwirlNSprinkle-divider"></div>
+      </div>
+    </div>
+
+    <div class="row g-3" data-gsap="stagger" data-stagger="0.1">
+      {% set vien = [
+        {"icon":"🧁","name":"Vanilla",      "desc":"Classic soft vanilla cupcake, light and airy.","price":"₹25","badge":""},
+        {"icon":"🧁","name":"Chocolate",    "desc":"Rich cocoa cupcake with a tender, moist crumb.","price":"₹25","badge":""},
+        {"icon":"🧁","name":"Red Velvet",   "desc":"Velvety red crumb with a hint of cocoa.","price":"₹25","badge":"Bestseller"},
+        {"icon":"🧁","name":"Tutti Frutti", "desc":"Colourful bits of candied fruit in every bite.","price":"₹25","badge":""},
+      ] %}
+      {% for item in vien %}
+      <div class="col-md-6 col-lg-4">
+        <div class="menu-item-card">
+          <div class="menu-item-icon">{{ item.icon }}</div>
+          <div class="flex-grow-1">
+            {% if item.badge %}<span class="menu-item-badge">{{ item.badge }}</span>{% endif %}
+            <div class="menu-item-name">{{ item.name }}</div>
+            <div class="menu-item-desc">{{ item.desc }}</div>
+          </div>
+          <div class="menu-item-price">{{ item.price }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WHITE TOPPING CUPCAKES
+══════════════════════════════════════════════════════════════ -->
+<section class="menu-cat-section" style="background:var(--g-cream);">
+  <div class="container">
+
+    <div class="row align-items-end mb-4" data-gsap="fade-up">
+      <div class="col">
+        <h2 class="menu-cat-title">White Topping Cupcakes</h2>
+        <p class="menu-cat-desc">Classic base with smooth creamy frosting.</p>
+        <div class="SwirlNSprinkle-divider"></div>
+      </div>
+    </div>
+
+    <div class="row g-3" data-gsap="stagger" data-stagger="0.1">
+      {% set breads = [
+        {"icon":"🧁","name":"Vanilla",      "desc":"Fluffy vanilla base crowned with silky white frosting.","price":"₹35","badge":""},
+        {"icon":"🧁","name":"Chocolate",    "desc":"Deep cocoa cupcake with a luscious creamy topping.","price":"₹35","badge":""},
+        {"icon":"🧁","name":"Red Velvet",   "desc":"Signature red crumb with smooth white cream frosting.","price":"₹35","badge":"Bestseller"},
+        {"icon":"🧁","name":"Tutti Frutti", "desc":"Fruity cupcake finished with a pillowy white swirl.","price":"₹35","badge":""},
+      ] %}
+      {% for item in breads %}
+      <div class="col-md-6 col-lg-4">
+        <div class="menu-item-card">
+          <div class="menu-item-icon">{{ item.icon }}</div>
+          <div class="flex-grow-1">
+            {% if item.badge %}<span class="menu-item-badge">{{ item.badge }}</span>{% endif %}
+            <div class="menu-item-name">{{ item.name }}</div>
+            <div class="menu-item-desc">{{ item.desc }}</div>
+          </div>
+          <div class="menu-item-price">{{ item.price }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SIGNATURE & FUSION TREATS
+══════════════════════════════════════════════════════════════ -->
+<section class="menu-cat-section" style="background:var(--g-parchment);">
+  <div class="container">
+
+    <div class="row align-items-end mb-4" data-gsap="fade-up">
+      <div class="col">
+        <h2 class="menu-cat-title">Signature &amp; Fusion Treats</h2>
+        <p class="menu-cat-desc">Rich, indulgent, and extra special.</p>
+        <div class="SwirlNSprinkle-divider"></div>
+      </div>
+    </div>
+
+    <div class="row g-3" data-gsap="stagger" data-stagger="0.1">
+      {% set cakes = [
+        {"icon":"🍰","name":"Red Velvet Cheese Cream", "desc":"Velvety red layers with a rich cheese cream filling.","price":"₹45","badge":""},
+        {"icon":"🎂","name":"Milk Rich Cake",          "desc":"Decadently moist cake soaked in creamy milk.","price":"₹70","badge":""},
+        {"icon":"🎂","name":"Rasmalai Rich Cake",      "desc":"Inspired by classic rasmalai — fragrant, soft, and indulgent.","price":"₹70","badge":"Fusion"},
+        {"icon":"🎂","name":"Gulab Jamun Rich Cake",   "desc":"Gulab jamun essence baked into every layer.","price":"₹70","badge":"Fusion"},
+      ] %}
+      {% for item in cakes %}
+      <div class="col-md-6 col-lg-4">
+        <div class="menu-item-card">
+          <div class="menu-item-icon">{{ item.icon }}</div>
+          <div class="flex-grow-1">
+            {% if item.badge %}<span class="menu-item-badge">{{ item.badge }}</span>{% endif %}
+            <div class="menu-item-name">{{ item.name }}</div>
+            <div class="menu-item-desc">{{ item.desc }}</div>
+          </div>
+          <div class="menu-item-price">{{ item.price }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ALLERGENS NOTE + ORDER CTA
+══════════════════════════════════════════════════════════════ -->
+<section class="py-section text-center" style="background:var(--g-cream);">
+  <div class="container" data-gsap="fade-up">
+    <p class="section-label mb-3 d-block">Good to Know</p>
+    <p class="lh-relaxed mb-5 mx-auto" style="max-width:560px;color:var(--g-text-mid);">
+      🟢 <strong>Eggless options available</strong> on all items. 📦 We accept
+      <strong>party &amp; bulk orders</strong> — reach us on WhatsApp at
+      <strong>9359992760</strong>. Located at The Mpire Township, Fursungi, Pune.
+    </p>
+    <a href="{{ url_for('order') }}" class="hero-btn-primary" style="font-size:.75rem;">
+      Place an Order Online &nbsp;→
+    </a>
+  </div>
+</section>
+
+{% endblock %}

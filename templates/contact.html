@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% block title %}Contact — SwirlNSprinkle Bakery{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════════════════
+     CONTACT HERO
+══════════════════════════════════════════════════════════════ -->
+<section class="about-hero">
+    <div class="about-hero-bg"></div>
+    <div class="container position-relative" style="z-index:2;">
+        <div class="row">
+            <div class="col-lg-8">
+                <span class="section-label mb-4 d-block">Get In Touch</span>
+                <h1 class="about-hero-title mb-4">
+                    We'd Love to<br><em>Hear From You</em>
+                </h1>
+                <p class="lh-relaxed" style="color:var(--g-text-light);max-width:520px;font-size:1.05rem;">
+                    Whether it's a question about our bread, a catering enquiry, or just a
+                    hello — our door is always open. Drop by or send us a message.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     FLASH MESSAGES
+══════════════════════════════════════════════════════════════ -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="container pt-4">
+    {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" style="border-radius:0;border-left:4px solid var(--g-terra);">
+        {{ msg }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<!-- ══════════════════════════════════════════════════════════════
+     MAIN: FORM + INFO
+══════════════════════════════════════════════════════════════ -->
+<section class="py-section" style="background:var(--g-parchment);">
+    <div class="container">
+        <div class="row g-5 align-items-start">
+
+            <!-- ── LEFT: Contact Form ─────────────────────────────────── -->
+            <div class="col-lg-7" data-gsap="fade-left">
+                <span class="section-label mb-3 d-block">Send a Message</span>
+                <div class="SwirlNSprinkle-divider mb-4"></div>
+                <h2 class="display-5 fw-bold mb-4">Say Hello</h2>
+
+                <form method="POST" action="{{ url_for('contact') }}" class="contact-form-card">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="g-label" for="first_name">First Name *</label>
+                            <input type="text" id="first_name" name="first_name"
+                                   class="g-input" required placeholder="Jane">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="g-label" for="last_name">Last Name</label>
+                            <input type="text" id="last_name" name="last_name"
+                                   class="g-input" placeholder="Smith">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="g-label" for="email">Email *</label>
+                            <input type="email" id="email" name="email"
+                                   class="g-input" required placeholder="jane@example.com">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="g-label" for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone"
+                                   class="g-input" placeholder="+1 555 000 0000">
+                        </div>
+                        <div class="col-12">
+                            <label class="g-label" for="message">Message *</label>
+                            <textarea id="message" name="message" class="g-input"
+                                      required placeholder="Tell us what's on your mind…"
+                                      style="min-height:150px;"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn-submit" style="max-width:260px;">
+                                Send Message &nbsp;→
+                            </button>
+                            <p class="mt-3" style="font-size:.75rem;color:var(--g-text-muted);">
+                                We reply within 24 hours. Your details are never shared.
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ── RIGHT: Info Blocks ─────────────────────────────────── -->
+            <div class="col-lg-4 offset-lg-1" data-gsap="fade-right">
+
+                <!-- Visit -->
+                <div class="contact-info-block mb-4">
+                    <div class="contact-info-icon">📍</div>
+                    <div>
+                        <h5 class="contact-info-title">Visit Us</h5>
+                        {% if location %}
+                        <p class="contact-info-text">
+                            {{ location.address }}<br>{{ location.city }}
+                        </p>
+                        {% if location.maps_url %}
+                        <a href="{{ location.maps_url }}" target="_blank" rel="noreferrer"
+                           class="contact-info-link">Get Directions &nbsp;↗</a>
+                        {% endif %}
+                        {% else %}
+                        <p class="contact-info-text">
+                            The Mpire Township<br>fursungi, Pune
+                        </p>
+                        <a href="https://maps.app.goo.gl/Z1EQTr6z6aSdw2yY8"
+                           target="_blank" rel="noreferrer" class="contact-info-link">Get Directions &nbsp;↗</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Hours -->
+                <div class="contact-info-block mb-4">
+                    <div class="contact-info-icon">🕐</div>
+                    <div>
+                        <h5 class="contact-info-title">Opening Hours</h5>
+                        <table class="hours-table">
+                            <tr>
+                                <td class="hours-day">Monday – Friday</td>
+                                <td class="hours-time">{{ location.hours_mon_fri if location else "7:00 am – 4:00 pm"
+                                    }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="hours-day">Saturday</td>
+                                <td class="hours-time">{{ location.hours_sat if location else "7:00 am – 3:00 pm" }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="hours-day">Sunday</td>
+                                <td class="hours-time">{{ location.hours_sun if location else "8:00 am – 2:00 pm" }}
+                                </td>
+                            </tr>
+                        </table>
+                        <p class="contact-info-text mt-2" style="font-size:.78rem;">
+                            Same-day online orders close at 2 pm daily.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Email & Phone -->
+                <div class="contact-info-block mb-4">
+                    <div class="contact-info-icon">✉️</div>
+                    <div>
+                        <h5 class="contact-info-title">Contact</h5>
+                        <p class="contact-info-text mb-1">
+                            <a href="mailto:{{ location.email if location else 'hello@SwirlNSprinklebakery.com' }}"
+                               class="contact-info-link">
+                                {{ location.email if location else 'hello@SwirlNSprinklebakery.com' }}
+                            </a>
+                        </p>
+                        {% if location and location.phone %}
+                        <p class="contact-info-text">
+                            <a href="tel:{{ location.phone }}" class="contact-info-link">
+                                {{ location.phone }}
+                            </a>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Social -->
+                <div class="contact-info-block">
+                    <div class="contact-info-icon">📣</div>
+                    <div>
+                        <h5 class="contact-info-title">Follow Us</h5>
+                        <p class="contact-info-text mb-3">
+                            Stay up to date with daily bakes, specials, and behind-the-scenes moments.
+                        </p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="https://www.instagram.com/" target="_blank" rel="noreferrer"
+                               class="social-pill">Instagram</a>
+                            <a href="https://www.facebook.com/" target="_blank" rel="noreferrer"
+                               class="social-pill">Facebook</a>
+                            <a href="https://www.tiktok.com/" target="_blank" rel="noreferrer"
+                               class="social-pill">TikTok</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MAP EMBED
+══════════════════════════════════════════════════════════════ -->
+<div class="contact-map-wrap">
+    {% if location and location.maps_url %}
+    {# If a Google Maps embed URL is stored, render it #}
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3784.20251900022!2d73.97068627882193!3d18.474483625764595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2e957481fb4df%3A0xee30febd34c66e22!2sThe%20Mpire%20Township%2C%20Fursungi%2C%20Pune%20project%20by%20The%20Weavers%2C%20GP%20Group!5e0!3m2!1sen!2sin!4v1776096545431!5m2!1sen!2sin"
+            width="100%" height="380" style="border:0;" allowfullscreen="" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade" title="SwirlNSprinkle Bakery location" >
+
+
+    </iframe>
+    {% else %}
+     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3784.20251900022!2d73.97068627882193!3d18.474483625764595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2e957481fb4df%3A0xee30febd34c66e22!2sThe%20Mpire%20Township%2C%20Fursungi%2C%20Pune%20project%20by%20The%20Weavers%2C%20GP%20Group!5e0!3m2!1sen!2sin!4v1776096545431!5m2!1sen!2sin"
+            width="100%" height="380" style="border:0;" allowfullscreen="" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade" title="SwirlNSprinkle Bakery location" >
+     </iframe>
+
+    {% endif %}
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CTA STRIP
+══════════════════════════════════════════════════════════════ -->
+<section class="py-section text-center" style="background:var(--g-cream);">
+    <div class="container" data-gsap="fade-up">
+        <h2 class="display-5 fw-bold mb-3">Ready to Order?</h2>
+        <p class="lh-relaxed mb-5 mx-auto" style="max-width:440px;color:var(--g-text-mid);">
+            Skip the queue — order online and collect fresh from the bakery.
+        </p>
+        <a href="{{ url_for('order') }}" class="hero-btn-primary">Order Online &nbsp;→</a>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ── Contact page styles ──────────────────────────────────────── */
+    .about-hero { background:var(--g-coffee);padding:7rem 0 5rem;position:relative;overflow:hidden; }
+    .about-hero-bg {
+      position:absolute;inset:0;
+      background-image:radial-gradient(rgba(192,98,42,.06) 1px,transparent 1px);
+      background-size:28px 28px;
+      pointer-events:none;
+    }
+
+    .contact-form-card {
+      background:var(--g-white);
+      border:1px solid rgba(92,51,22,.09);
+      padding:2.5rem;
+      box-shadow:var(--shadow-card);
+    }
+
+    .contact-info-block {
+      display:flex;
+      gap:1.1rem;
+      align-items:flex-start;
+      padding:1.4rem 1.6rem;
+      background:var(--g-white);
+      border:1px solid rgba(92,51,22,.08);
+      box-shadow:var(--shadow-card);
+    }
+    .contact-info-icon { font-size:1.4rem; flex-shrink:0; line-height:1; margin-top:.1rem; }
+    .contact-info-title {
+      font-family:var(--ff-display);
+      font-size:1rem;
+      font-weight:700;
+      color:var(--g-espresso);
+      margin-bottom:.5rem;
+    }
+    .contact-info-text { font-size:.87rem; color:var(--g-text-mid); line-height:1.8; margin:0; }
+    .contact-info-link { color:var(--g-terra); font-size:.82rem; font-weight:600; text-decoration:none; }
+    .contact-info-link:hover { color:var(--g-amber); }
+
+    .hours-table { width:100%; border-collapse:collapse; }
+    .hours-day { font-size:.82rem; color:var(--g-text-muted); padding:.25rem 0; padding-right:1rem; }
+    .hours-time { font-size:.82rem; color:var(--g-espresso); font-weight:600; }
+
+    .social-pill {
+      display:inline-block;
+      border:1px solid rgba(192,98,42,.3);
+      color:var(--g-terra);
+      font-size:.68rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:600;
+      padding:.3rem .9rem;
+      border-radius:var(--radius-sm);
+      transition:background var(--transition),color var(--transition);
+    }
+    .social-pill:hover { background:var(--g-terra);color:var(--g-white); }
+
+    .contact-map-wrap { line-height:0; border-top:3px solid var(--g-terra); }
+</style>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmed — SwirlNSprinkle Bakery{% endblock %}
+
+{% block content %}
+<section class="py-section" style="background:var(--g-parchment);min-height:70vh;display:flex;align-items:center;">
+  <div class="container">
+    <div class="row justify-content-center text-center">
+      <div class="col-lg-6" data-gsap="fade-up">
+
+        <div style="font-size:4rem;margin-bottom:1.5rem;">🥐</div>
+        <span class="section-label mb-3 d-block">Order #{{ order.id }}</span>
+        <div class="SwirlNSprinkle-divider mx-auto mb-4"></div>
+        <h1 class="display-5 fw-bold mb-3">You're all set, {{ order.name.split()[0] }}!</h1>
+        <p class="lh-relaxed mb-2" style="color:var(--g-text-mid);max-width:420px;margin:0 auto;">
+          We've received your order and sent a confirmation to
+          <strong>{{ order.email }}</strong>.
+        </p>
+
+        {% if order.pickup_slot %}
+        <div style="margin:2rem auto;max-width:340px;background:var(--g-white);border:1px solid rgba(92,51,22,.1);padding:1.4rem 2rem;box-shadow:var(--shadow-card);">
+          <p style="font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--g-terra);font-weight:600;margin-bottom:.4rem;">Your Pickup Window</p>
+          <p style="font-family:var(--ff-display);font-size:1.25rem;color:var(--g-espresso);margin:0;font-weight:700;">{{ order.pickup_slot }}</p>
+        </div>
+        {% endif %}
+
+        <div style="margin:1.5rem auto 2.5rem;max-width:380px;background:var(--g-white);border:1px solid rgba(92,51,22,.1);padding:1.4rem 2rem;box-shadow:var(--shadow-card);text-align:left;">
+          <p style="font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--g-terra);font-weight:600;margin-bottom:.8rem;">Order Summary</p>
+          {% for part in order.items.split(', ') %}
+            {% set pieces = part.rsplit(' x', 1) %}
+            <div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid rgba(92,51,22,.07);font-size:.87rem;color:var(--g-text-mid);">
+              <span>{{ pieces[0] }}</span>
+              <span style="font-weight:600;">× {{ pieces[1] if pieces|length > 1 else '1' }}</span>
+            </div>
+          {% endfor %}
+          {% if order.promo_code %}
+          <div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.82rem;color:var(--g-terra);">
+            <span>Promo ({{ order.promo_code }})</span>
+            <span>applied ✓</span>
+          </div>
+          {% endif %}
+          <div style="display:flex;justify-content:space-between;padding:.7rem 0 0;font-size:1rem;font-weight:700;color:var(--g-espresso);">
+            <span>Total</span>
+            <span>₹{{ order.total|int }}</span>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+          <a href="{{ url_for('index') }}" class="hero-btn-primary">Back to Home &nbsp;→</a>
+          <a href="{{ url_for('order') }}" class="hero-btn-outline">Place Another Order</a>
+        </div>
+
+        <p class="mt-4" style="font-size:.78rem;color:var(--g-text-muted);">
+          Questions? Email us at
+          <a href="mailto:hello@SwirlNSprinklebakery.com" style="color:var(--g-terra);">hello@SwirlNSprinklebakery.com</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     RATING SECTION
+══════════════════════════════════════════════════════════════ -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="container" style="max-width:560px;">
+    {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" style="border-radius:0;border-left:4px solid var(--g-terra);margin-bottom:0;">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<section class="py-section" style="background:var(--g-cream);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6" data-gsap="fade-up">
+
+        <div class="text-center mb-4">
+          <span class="section-label mb-3 d-block">Quick Feedback</span>
+          <div class="SwirlNSprinkle-divider mx-auto mb-4"></div>
+          <h2 class="display-6 fw-bold mb-2">How did we do?</h2>
+          <p style="color:var(--g-text-muted);font-size:.9rem;line-height:1.8;">
+            Your review helps other neighbours find us — and helps us bake even better.
+          </p>
+        </div>
+
+        {% if not already_reviewed %}
+        <div class="rating-card">
+          <form method="POST" action="{{ url_for('review_submit') }}" id="ratingForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="order_id" value="{{ order.id }}">
+            <input type="hidden" name="stars" id="starsInput" value="">
+
+            <!-- Star picker -->
+            <div class="star-picker" id="starPicker" role="group" aria-label="Star rating">
+              {% for n in [1,2,3,4,5] %}
+              <button type="button" class="star-btn" data-val="{{ n }}" aria-label="{{ n }} star{{ 's' if n > 1 }}">★</button>
+              {% endfor %}
+            </div>
+            <p id="starLabel" class="star-label-text">Tap a star to rate</p>
+
+            <div class="mt-3">
+              <label class="g-label" for="rev_name">Your Name *</label>
+              <input type="text" id="rev_name" name="name" class="g-input"
+                     value="{{ order.name.split()[0] }}" required
+                     placeholder="First name">
+            </div>
+            <div class="mt-3">
+              <label class="g-label" for="rev_comment">Leave a comment <span style="color:var(--g-text-muted);font-weight:400;">(optional)</span></label>
+              <textarea id="rev_comment" name="comment" class="g-input"
+                        placeholder="What did you love? Any suggestions?" style="min-height:90px;"></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit mt-4" id="ratingSubmitBtn" disabled>
+              Submit Review &nbsp;★
+            </button>
+            <p style="font-size:.7rem;color:var(--g-text-muted);margin-top:.6rem;text-align:center;">
+              Reviews are moderated before appearing on the homepage.
+            </p>
+          </form>
+        </div>
+        {% else %}
+        <div class="rating-card text-center" style="padding:2.5rem;">
+          <div style="font-size:2.5rem;margin-bottom:.8rem;">🌟</div>
+          <h4 style="font-family:var(--ff-display);color:var(--g-espresso);margin-bottom:.5rem;">Review submitted!</h4>
+          <p style="font-size:.88rem;color:var(--g-text-muted);">Thank you — we'll publish it shortly after a quick check.</p>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+/* ── Rating widget ───────────────────────────────────────── */
+.rating-card {
+  background: var(--g-white);
+  border: 1px solid rgba(92,51,22,.09);
+  padding: 2.2rem 2.4rem;
+  box-shadow: var(--shadow-card);
+}
+.star-picker {
+  display: flex;
+  gap: .3rem;
+  justify-content: center;
+  margin: .4rem 0 .2rem;
+}
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 2.6rem;
+  color: var(--g-cream-dark);
+  cursor: pointer;
+  padding: 0 .15rem;
+  line-height: 1;
+  transition: color .15s, transform .15s;
+}
+.star-btn.lit   { color: #e08a3c; }
+.star-btn:hover { transform: scale(1.15); }
+.star-label-text {
+  text-align: center;
+  font-size: .75rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--g-text-muted);
+  min-height: 1.2em;
+  margin-top: .3rem;
+}
+</style>
+
+<script>
+(function(){
+  const LABELS = ['','Terrible 😔','Could be better 😕','It was ok 🙂','Really good! 😊','Absolutely loved it! 🥐'];
+  const stars   = document.querySelectorAll('.star-btn');
+  const input   = document.getElementById('starsInput');
+  const label   = document.getElementById('starLabel');
+  const submitBtn = document.getElementById('ratingSubmitBtn');
+
+  if (!stars.length) return;
+
+  function paint(val) {
+    stars.forEach(s => s.classList.toggle('lit', +s.dataset.val <= val));
+  }
+
+  stars.forEach(btn => {
+    btn.addEventListener('mouseenter', () => paint(+btn.dataset.val));
+    btn.addEventListener('mouseleave', () => paint(+input.value || 0));
+    btn.addEventListener('click', () => {
+      const v = +btn.dataset.val;
+      input.value = v;
+      label.textContent = LABELS[v];
+      paint(v);
+      submitBtn.disabled = false;
+    });
+  });
+})();
+</script>
+{% endblock %}

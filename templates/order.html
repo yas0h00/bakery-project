@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+{% block title %}Order — SwirlNSprinkle Bakery{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════════════════
+     ORDER HERO
+══════════════════════════════════════════════════════════════ -->
+<section class="order-hero">
+  <div class="container position-relative" style="z-index:2;">
+    <span class="section-label mb-3 d-block">Online Ordering</span>
+    <h1 class="about-hero-title" style="color:var(--g-cream);">
+      Place Your <em>Order</em>
+    </h1>
+    <p class="lh-relaxed mt-3" style="color:var(--g-text-light);max-width:480px;">
+      Pick your items, drop your details, and we'll have everything ready for collection.
+      Same-day orders close at 2 pm.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     FLASH MESSAGES
+══════════════════════════════════════════════════════════════ -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="container pt-4">
+    {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" style="border-radius:0;border-left:4px solid var(--g-terra);">
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<!-- ══════════════════════════════════════════════════════════════
+     ORDER FORM
+══════════════════════════════════════════════════════════════ -->
+<section class="order-section py-section">
+  <div class="container">
+    <form method="POST" action="{{ url_for('order') }}" id="orderForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <!-- items & total injected by JS before submit -->
+      <input type="hidden" name="items" id="hiddenItems">
+      <input type="hidden" name="total" id="hiddenTotal">
+
+      <div class="row g-5">
+
+        <!-- ── LEFT: Item Picker ───────────────────────────────── -->
+        <div class="col-lg-7" data-gsap="fade-left">
+
+          <h2 class="menu-cat-title mb-1">1. Choose Your Items</h2>
+          <p class="menu-cat-desc mb-4">Click an item to add it; use +/− to adjust quantity.</p>
+
+          <!-- Viennoiserie -->
+          <h5 class="section-label mb-3">Viennoiserie</h5>
+          <div class="mb-4" id="picker-vien">
+            {% set vien_items = [
+              ("Classic Butter Croissant", 457),
+              ("Almond Croissant",         6.50),
+              ("Chocolate Croissant",      6.00),
+              ("Ham & Gruyère Croissant",  8.00),
+            ] %}
+            {% for name, price in vien_items %}
+            <div class="order-item" data-name="{{ name }}" data-price="{{ price }}">
+              <div>
+                <div class="order-item-name">{{ name }}</div>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <div class="qty-ctrl" style="display:none!important;" id="ctrl-{{ loop.index0 }}-vien">
+                  <button type="button" class="qty-btn minus">−</button>
+                  <span class="qty-val">0</span>
+                  <button type="button" class="qty-btn plus">+</button>
+                </div>
+                <div class="order-item-price">₹{{ price|int }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Breads -->
+          <h5 class="section-label mb-3">Artisan Breads</h5>
+          <div class="mb-4" id="picker-bread">
+            {% set bread_items = [
+              ("Classic Sourdough Loaf",   9.50),
+              ("Light Rye Pan Loaf",       9.00),
+              ("Olive & Rosemary Focaccia",7.50),
+              ("Brioche Pullman",         11.00),
+            ] %}
+            {% for name, price in bread_items %}
+            <div class="order-item" data-name="{{ name }}" data-price="{{ price }}">
+              <div>
+                <div class="order-item-name">{{ name }}</div>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <div class="qty-ctrl" style="display:none!important;" id="ctrl-{{ loop.index0 }}-bread">
+                  <button type="button" class="qty-btn minus">−</button>
+                  <span class="qty-val">0</span>
+                  <button type="button" class="qty-btn plus">+</button>
+                </div>
+                <div class="order-item-price">₹{{ price|int }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Pastries & Cakes -->
+          <h5 class="section-label mb-3">Pastries &amp; Cakes</h5>
+          <div class="mb-4" id="picker-cake">
+            {% set cake_items = [
+              ("Basque Cheesecake",       9.00),
+              ("Lemon Frangipane Tart",   8.50),
+              ("Kouign-Amann",            7.50),
+              ("Financiers",              4.00),
+            ] %}
+            {% for name, price in cake_items %}
+            <div class="order-item" data-name="{{ name }}" data-price="{{ price }}">
+              <div>
+                <div class="order-item-name">{{ name }}</div>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <div class="qty-ctrl" style="display:none!important;" id="ctrl-{{ loop.index0 }}-cake">
+                  <button type="button" class="qty-btn minus">−</button>
+                  <span class="qty-val">0</span>
+                  <button type="button" class="qty-btn plus">+</button>
+                </div>
+                <div class="order-item-price">₹{{ price|int }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Pickup Time Slot -->
+          <h2 class="menu-cat-title mb-1 mt-5">2. Choose a Pickup Window</h2>
+          <p class="menu-cat-desc mb-4">Select your preferred collection time. Same-day orders close at 2 pm.</p>
+          <div class="order-card mb-2">
+            <label class="g-label" for="pickup_slot">Pickup Time *</label>
+            <select id="pickup_slot" name="pickup_slot" class="g-input" required>
+              <option value="" disabled selected>— Select a time slot —</option>
+              {% for slot in pickup_slots %}
+              <option value="{{ slot }}">{{ slot }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Customer Details -->
+          <h2 class="menu-cat-title mb-1 mt-5">3. Your Details</h2>
+          <p class="menu-cat-desc mb-4">We'll use these to confirm your order.</p>
+
+          <div class="order-card">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="g-label" for="order_name">Full Name *</label>
+                <input type="text" id="order_name" name="name"
+                       class="g-input" required placeholder="Jane Smith">
+              </div>
+              <div class="col-md-6">
+                <label class="g-label" for="order_phone">Phone</label>
+                <input type="tel" id="order_phone" name="phone"
+                       class="g-input" placeholder="+1 555 000 0000">
+              </div>
+              <div class="col-12">
+                <label class="g-label" for="order_email">Email *</label>
+                <input type="email" id="order_email" name="email"
+                       class="g-input" required placeholder="jane@example.com">
+              </div>
+              <div class="col-12">
+                <label class="g-label" for="order_notes">Special Requests / Notes</label>
+                <textarea id="order_notes" name="notes" class="g-input"
+                          placeholder="Allergies, collection time, etc."></textarea>
+              </div>
+              <!-- Promo code -->
+              <div class="col-12">
+                <label class="g-label" for="promo_code">Promo Code</label>
+                <div class="d-flex gap-2">
+                  <input type="text" id="promo_code" name="promo_code"
+                         class="g-input" placeholder="e.g. SWEET7"
+                         style="text-transform:uppercase;letter-spacing:.05em;">
+                  <button type="button" id="applyPromo" class="hero-btn-outline"
+                          style="white-space:nowrap;padding:.65rem 1.1rem;font-size:.7rem;">
+                    Apply
+                  </button>
+                </div>
+                <p id="promoMsg" style="font-size:.78rem;margin-top:.4rem;min-height:1.2em;"></p>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /col left -->
+
+        <!-- ── RIGHT: Summary ──────────────────────────────────── -->
+        <div class="col-lg-5" data-gsap="fade-right">
+          <div class="order-summary">
+            <div class="order-summary-title">Order Summary</div>
+
+            <div id="summaryLines">
+              <p style="color:var(--g-text-light);font-size:.85rem;margin:0;">
+                No items selected yet.
+              </p>
+            </div>
+
+            <div id="discountLine" style="display:none;" class="summary-line">
+              <span class="summary-line-name" id="discountLabel">Promo discount</span>
+              <span class="summary-line-price" id="discountAmt" style="color:var(--g-terra);"></span>
+            </div>
+
+            <div class="summary-total">
+              <span class="summary-total-label">Total</span>
+              <span class="summary-total-val" id="summaryTotal">₹0</span>
+            </div>
+
+            <button type="submit" class="btn-submit mt-4" id="submitBtn" disabled>
+              Place Order &nbsp;→
+            </button>
+            <p style="font-size:.7rem;color:var(--g-text-light);margin-top:.75rem;text-align:center;">
+              Collection only · Orders confirmed by email
+            </p>
+          </div>
+        </div><!-- /col right -->
+
+      </div><!-- /row -->
+    </form>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+  const cart = {};   // { "Item Name": { price, qty } }
+  let promoDiscount = 0;
+  let promoCode     = "";
+
+  function updateSummary() {
+    const lines      = document.getElementById('summaryLines');
+    const totEl      = document.getElementById('summaryTotal');
+    const btn        = document.getElementById('submitBtn');
+    const hItems     = document.getElementById('hiddenItems');
+    const hTotal     = document.getElementById('hiddenTotal');
+    const discLine   = document.getElementById('discountLine');
+    const discAmt    = document.getElementById('discountAmt');
+    const discLbl    = document.getElementById('discountLabel');
+
+    let subtotal = 0;
+    let html     = '';
+    const orderParts = [];
+
+    for (const [name, { price, qty }] of Object.entries(cart)) {
+      if (qty <= 0) continue;
+      const sub = price * qty;
+      subtotal += sub;
+      html += `<div class="summary-line">
+        <span class="summary-line-name">${name} × ${qty}</span>
+        <span class="summary-line-price">$${sub.toFixed(2)}</span>
+      </div>`;
+      orderParts.push(`${name} x${qty}`);
+    }
+
+    lines.innerHTML = html || '<p style="color:var(--g-text-light);font-size:.85rem;margin:0;">No items selected yet.</p>';
+
+    if (promoDiscount > 0 && subtotal > 0) {
+      discLine.style.display = '';
+      discLbl.textContent = promoCode ? `Promo (${promoCode})` : 'Promo discount';
+      discAmt.textContent = `−₹${Math.round(promoDiscount)}`;
+    } else {
+      discLine.style.display = 'none';
+    }
+
+    const total = Math.max(0, subtotal - (subtotal > 0 ? promoDiscount : 0));
+    totEl.textContent = '₹' + Math.round(total);
+    hItems.value = orderParts.join(', ');
+    hTotal.value = subtotal.toFixed(2);   // server applies promo server-side
+    btn.disabled  = subtotal === 0;
+  }
+
+  document.querySelectorAll('.order-item').forEach(function (row) {
+    const name  = row.dataset.name;
+    const price = parseFloat(row.dataset.price);
+    const ctrl  = row.querySelector('.qty-ctrl');
+    const valEl = row.querySelector('.qty-val');
+    const plus  = row.querySelector('.qty-btn.plus');
+    const minus = row.querySelector('.qty-btn.minus');
+
+    cart[name] = { price, qty: 0 };
+
+    // Click row → show controls + add 1
+    row.addEventListener('click', function (e) {
+      if (e.target.classList.contains('qty-btn')) return;
+      if (cart[name].qty === 0) {
+        cart[name].qty = 1;
+        valEl.textContent = 1;
+        ctrl.style.removeProperty('display');
+        row.classList.add('selected');
+        updateSummary();
+      }
+    });
+
+    plus.addEventListener('click', function (e) {
+      e.stopPropagation();
+      cart[name].qty++;
+      valEl.textContent = cart[name].qty;
+      updateSummary();
+    });
+
+    minus.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (cart[name].qty > 0) {
+        cart[name].qty--;
+        valEl.textContent = cart[name].qty;
+        if (cart[name].qty === 0) {
+          ctrl.style.display = 'none';
+          row.classList.remove('selected');
+        }
+        updateSummary();
+      }
+    });
+  });
+
+  // Promo code validation
+  document.getElementById('applyPromo').addEventListener('click', function () {
+    const code = document.getElementById('promo_code').value.trim().toUpperCase();
+    const msg  = document.getElementById('promoMsg');
+    if (!code) {
+      msg.style.color = 'var(--g-text-muted)';
+      msg.textContent = 'Enter a code first.';
+      return;
+    }
+    fetch('/api/validate-promo', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrf_token]').value
+      },
+      body: JSON.stringify({ code })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.valid) {
+        promoDiscount = data.value;
+        promoCode     = data.code;
+        msg.style.color = 'var(--g-terra)';
+        msg.textContent = '✓ ' + data.description;
+      } else {
+        promoDiscount = 0;
+        promoCode     = '';
+        msg.style.color = '#b00';
+        msg.textContent = 'Invalid promo code.';
+      }
+      updateSummary();
+    })
+    .catch(() => {
+      msg.style.color = '#b00';
+      msg.textContent = 'Could not validate — try again.';
+    });
+  });
+
+  // Guard: ensure at least 1 item before submitting
+  document.getElementById('orderForm').addEventListener('submit', function (e) {
+    if (!document.getElementById('hiddenTotal').value ||
+        parseFloat(document.getElementById('hiddenTotal').value) === 0) {
+      e.preventDefault();
+      alert('Please select at least one item before placing your order.');
+    }
+  });
+})();
+</script>
+{% endblock %}

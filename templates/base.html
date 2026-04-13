@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#100d07">
+  <meta name="description" content="SwirlNSprinkle — Artisanal Bakery & Bakehouse. Handmade pastries and breads baked fresh daily.">
+  <title>{% block title %}SwirlNSprinkle — Artisanal Bakery{% endblock %}</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap"
+        rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%90%3C/text%3E%3C/svg%3E">
+
+  {% block extra_head %}{% endblock %}
+
+  <!--
+    FIX 1: Page-wipe CSS is defined here in <head> so it's painted
+    before any JS runs — no flash of unstyled wipe overlay.
+    The wipe starts fully visible (scaleY:1) and is removed by JS.
+  -->
+  <style>
+    #page-wipe {
+      position: fixed;
+      inset: 0;
+      background: var(--g-espresso, #1e140a);
+      z-index: 8000;
+      transform-origin: top;
+      /* starts covering the page; JS will slide it away */
+      transform: scaleY(1);
+      /* no transition here — GSAP controls it */
+      pointer-events: none;
+    }
+  </style>
+
+  <!--
+    FIX 2: Inline the page-wipe OUT animation as early as possible,
+    before GSAP loads, using a plain CSS animation.
+    This means the wipe slides away the moment CSS is parsed —
+    zero dependency on GSAP or load events.
+  -->
+  <style>
+    @keyframes wipeOut {
+      0%   { transform: scaleY(1); transform-origin: top; }
+      100% { transform: scaleY(0); transform-origin: top; }
+    }
+    #page-wipe { animation: wipeOut 0.55s cubic-bezier(0.76,0,0.24,1) 0.05s forwards; }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor dots (desktop only) -->
+<div id="gc-dot"  aria-hidden="true"></div>
+<div id="gc-ring" aria-hidden="true"></div>
+
+<!-- Page-transition wipe overlay -->
+<div id="page-wipe" aria-hidden="true"></div>
+
+<!-- ── NAVBAR ──────────────────────────────────────────────────── -->
+<nav class="SwirlNSprinkle-nav navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container">
+
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <span class="brand-letter">Swirl &</span>Sprinkle
+    </a>
+
+    <button class="SwirlNSprinkle-toggler navbar-toggler border-0 p-0"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navMenu"
+            aria-controls="navMenu"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-1 align-items-lg-center">
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'index' }}"
+             href="{{ url_for('index') }}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'menu' }}"
+             href="{{ url_for('menu') }}">Menu</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'about' }}"
+             href="{{ url_for('about') }}">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'contact' }}"
+             href="{{ url_for('contact') }}">Contact</a>
+        </li>
+      </ul>
+      <a href="{{ url_for('order') }}" class="btn-order ms-lg-4 d-none d-lg-inline-flex">
+        Order Now &nbsp;↗
+      </a>
+      <a href="{{ url_for('order') }}" class="btn-order btn-order-mobile d-lg-none mt-3">
+        Order Now &nbsp;↗
+      </a>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ── MAIN CONTENT ─────────────────────────────────────────────── -->
+<main>{% block content %}{% endblock %}</main>
+
+<!-- ── FOOTER ───────────────────────────────────────────────────── -->
+<footer class="SwirlNSprinkle-footer py-5">
+  <div class="container">
+    <div class="row gy-4">
+
+      <div class="col-md-4">
+        <h5 class="footer-brand mb-3">SwirlNSprinkle</h5>
+        <p class="text-muted small">
+          Artisanal Bakery &amp; Bakehouse.<br>
+          Handmade with love — three generations strong.
+        </p>
+      </div>
+
+      <div class="col-md-2">
+        <h6 class="footer-heading mb-3">Navigate</h6>
+        <ul class="list-unstyled small">
+          <li><a href="{{ url_for('index') }}"   class="footer-link">Home</a></li>
+          <li><a href="{{ url_for('menu') }}"    class="footer-link">Menu</a></li>
+          <li><a href="{{ url_for('about') }}"   class="footer-link">About</a></li>
+          <li><a href="{{ url_for('contact') }}" class="footer-link">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-3">
+        <h6 class="footer-heading mb-3">Legal</h6>
+        <ul class="list-unstyled small">
+          <li><a href="{{ url_for('privacy') }}"       class="footer-link">Privacy Policy</a></li>
+          <li><a href="{{ url_for('terms') }}"         class="footer-link">Terms &amp; Conditions</a></li>
+          <li><a href="{{ url_for('accessibility') }}" class="footer-link">Accessibility</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-3">
+        <h6 class="footer-heading mb-3">Follow Us</h6>
+        <div class="d-flex gap-3 mb-3">
+          <a href="https://www.instagram.com/" target="_blank" rel="noreferrer noopener"
+             class="footer-social" aria-label="Instagram">Ig</a>
+          <a href="https://www.facebook.com/"  target="_blank" rel="noreferrer noopener"
+             class="footer-social" aria-label="Facebook">Fb</a>
+          <a href="https://www.tiktok.com/"    target="_blank" rel="noreferrer noopener"
+             class="footer-social" aria-label="TikTok">Tk</a>
+        </div>
+        <a href="mailto:whoishsay000@gmail.com" class="footer-link small">whoishsay000@gmail.com</a>
+      </div>
+
+    </div>
+    <hr class="footer-hr mt-4 mb-3">
+    <p class="text-muted small text-center mb-0">
+      &copy; {{ now.year }} SwirlNSprinkle Bakery. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+<!-- Bootstrap JS (defer via placement at bottom) -->
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+
+<!--
+  FIX 3: GSAP loaded at bottom of body (not in <head>), so it no
+  longer blocks page rendering. ScrollTrigger loaded right after.
+-->
+<script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ScrollTrigger.min.js') }}"></script>
+
+<script>
+(function () {
+
+  /* ── 1. Custom cursor — runs immediately, no load event needed ── */
+  (function initCursor() {
+    var dot  = document.getElementById('gc-dot');
+    var ring = document.getElementById('gc-ring');
+    if (!dot || !ring) return;
+    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+
+    var mx = -300, my = -300, rx = -300, ry = -300, moved = false;
+
+    document.addEventListener('mousemove', function (e) {
+      mx = e.clientX; my = e.clientY;
+      if (!moved) {
+        moved = true;
+        dot.classList.add('cursor-ready');
+        ring.classList.add('cursor-ready');
+      }
+    }, { passive: true });
+
+    (function loop() {
+      rx += (mx - rx) * 0.13;
+      ry += (my - ry) * 0.13;
+      dot.style.transform  = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
+      ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
+      requestAnimationFrame(loop);
+    })();
+
+    function bindHover() {
+      document.querySelectorAll('a,button,.menu-item-card,.team-card,.order-item,[data-cursor-expand]')
+        .forEach(function (el) {
+          el.addEventListener('mouseenter', function () { ring.classList.add('ring-expand'); });
+          el.addEventListener('mouseleave', function () { ring.classList.remove('ring-expand'); });
+        });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bindHover);
+    } else {
+      bindHover();
+    }
+  })();
+
+  /* ── 2. Navbar shrink on scroll — no GSAP needed ──────────────── */
+  var nav = document.getElementById('mainNav');
+  if (nav) {
+    window.addEventListener('scroll', function () {
+      nav.classList.toggle('nav-scrolled', window.scrollY > 60);
+    }, { passive: true });
+  }
+
+  /* ── 3. Page-wipe transition — fast CSS-first, GSAP as backup ──── */
+  /*
+    The wipe-OUT on page load is handled entirely by the CSS
+    @keyframes wipeOut defined in <head> — no JS needed, no lag.
+
+    The wipe-IN (when clicking a link) uses a lightweight CSS
+    transition so it works even if GSAP is still parsing.
+  */
+  var wipe = document.getElementById('page-wipe');
+
+  if (wipe) {
+    // Intercept internal link clicks
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a[href]');
+      if (!link) return;
+
+      var href = link.getAttribute('href');
+
+      // Ignore: external, hash, mailto, tel, target=_blank, form actions
+      if (!href
+        || href.startsWith('http')
+        || href.startsWith('//')
+        || href.startsWith('#')
+        || href.startsWith('mailto')
+        || href.startsWith('tel')
+        || link.target === '_blank'
+        || link.hasAttribute('data-bs-toggle')
+        || link.hasAttribute('data-no-wipe')) return;
+
+      e.preventDefault();
+
+      // Cancel the CSS exit animation so we can re-use the element
+      wipe.style.animation = 'none';
+      wipe.style.transformOrigin = 'bottom';
+      wipe.style.transform = 'scaleY(0)';
+
+      /* force reflow */
+      void wipe.offsetHeight;
+
+      /* slide IN — pure CSS transition, no GSAP dependency */
+      wipe.style.transition = 'transform 0.38s cubic-bezier(0.76,0,0.24,1)';
+      wipe.style.transform  = 'scaleY(1)';
+      wipe.style.pointerEvents = 'all';
+
+      /* navigate after wipe covers the screen */
+      var dest = href;
+      setTimeout(function () {
+        window.location.href = dest;
+      }, 390); /* slightly longer than transition so it's fully covered */
+    });
+  }
+
+  /* ── 4. GSAP scroll animations — only after GSAP is available ─── */
+  function initGSAP() {
+    if (!window.gsap) return;
+
+    if (window.ScrollTrigger) {
+      gsap.registerPlugin(ScrollTrigger);
+    }
+
+    /* Hero entrance */
+    var heroEyebrow = document.querySelector('.hero-eyebrow');
+    var heroTitle   = document.querySelector('.hero-title');
+    var heroSub     = document.querySelector('.hero-sub');
+    var heroCtaWrap = document.querySelector('.hero-cta-wrap');
+    var heroScroll  = document.querySelector('.hero-scroll-hint');
+
+    if (heroTitle) {
+      var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      if (heroEyebrow) tl.from(heroEyebrow, { opacity: 0, y: 20, duration: 0.6 }, 0.2);
+      tl.from(heroTitle,   { opacity: 0, y: 50, duration: 0.9 }, 0.35);
+      if (heroSub)     tl.from(heroSub,     { opacity: 0, y: 22, duration: 0.6 }, 0.75);
+      if (heroCtaWrap) tl.from(heroCtaWrap, { opacity: 0, y: 18, duration: 0.5 }, 0.95);
+      if (heroScroll)  tl.from(heroScroll,  { opacity: 0, duration: 0.5 },        1.2);
+    }
+
+    if (!window.ScrollTrigger) return;
+
+    /* Fade-up */
+    gsap.utils.toArray('[data-gsap="fade-up"]').forEach(function (el) {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+        opacity: 0, y: 48, duration: 0.85, ease: 'power3.out',
+        delay: parseFloat(el.dataset.delay || 0)
+      });
+    });
+
+    /* Fade-left */
+    gsap.utils.toArray('[data-gsap="fade-left"]').forEach(function (el) {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+        opacity: 0, x: -60, duration: 0.9, ease: 'power3.out',
+        delay: parseFloat(el.dataset.delay || 0)
+      });
+    });
+
+    /* Fade-right */
+    gsap.utils.toArray('[data-gsap="fade-right"]').forEach(function (el) {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+        opacity: 0, x: 60, duration: 0.9, ease: 'power3.out',
+        delay: parseFloat(el.dataset.delay || 0)
+      });
+    });
+
+    /* Stagger */
+    gsap.utils.toArray('[data-gsap="stagger"]').forEach(function (parent) {
+      gsap.from(parent.children, {
+        scrollTrigger: { trigger: parent, start: 'top 85%', toggleActions: 'play none none none' },
+        opacity: 0, y: 40, duration: 0.7, ease: 'power3.out',
+        stagger: parseFloat(parent.dataset.stagger || 0.12)
+      });
+    });
+
+    /* Animated counters */
+    gsap.utils.toArray('.stat-num[data-count]').forEach(function (el) {
+      var target = parseFloat(el.dataset.count);
+      var suffix = el.dataset.suffix || '';
+      ScrollTrigger.create({
+        trigger: el, start: 'top 85%', once: true,
+        onEnter: function () {
+          gsap.fromTo({ val: 0 }, { val: target }, {
+            duration: 1.8, ease: 'power2.out',
+            onUpdate: function () {
+              el.textContent = Math.round(this.targets()[0].val) + suffix;
+            }
+          });
+        }
+      });
+    });
+
+    /* Parallax hero bg */
+    var heroBg = document.querySelector('.hero-bg-parallax');
+    if (heroBg) {
+      gsap.to(heroBg, {
+        scrollTrigger: { trigger: heroBg, scrub: true },
+        y: '30%', ease: 'none'
+      });
+    }
+  }
+
+  /* Run GSAP init after DOM is ready */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGSAP);
+  } else {
+    initGSAP();
+  }
+
+})();
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
