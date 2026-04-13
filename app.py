@@ -60,7 +60,7 @@ PROMO_CODES = {
 }
 
 # ── Baker notification recipient ──────────────────────────────────
-BAKERY_NOTIFY_EMAIL = os.environ.get("BAKERY_NOTIFY_EMAIL", "whoishsay000@gmail.com")
+BAKERY_NOTIFY_EMAIL = os.environ.get("BAKERY_NOTIFY_EMAIL")
 
 csrf = CSRFProtect(app)
 db   = SQLAlchemy(app)
