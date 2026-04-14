@@ -124,11 +124,11 @@
     <!-- scroll-driven video -->
     <video id="vidScrollPlayer"
            src="{{ url_for('static', filename='videos/0413_1_scrub.mp4') }}"
-           muted playsinline preload="none"
+           muted playsinline preload="auto"
            disablepictureinpicture
            style="position:relative;z-index:2;display:block;
                   width:100%;height:100%;object-fit:cover;
-                  will-change:contents;transform:translateZ(0);
+                  will-change:transform;transform:translateZ(0);
                   backface-visibility:hidden;"></video>
 
     <!-- scroll hint -->
@@ -410,9 +410,12 @@
 
 <script>
 /* ═══════════════════════════════════════════
-   VIDEO SCROLL — all-intra scrub (no B-frames)
-   Every frame in the re-encoded file is a keyframe,
-   so direct currentTime seeks are instant — no lerp needed.
+   VIDEO SCROLL — smooth scrub, 5 s cap, no black screen
+   • preload="metadata" fires fast → no cold-start stutter
+   • VIDEO_SCRUB_MAX caps playback at 5 s regardless of file length
+   • raf-lerp smooths the seek on every frame for buttery motion
+   • Poster image prevents the black-before-decode flash
+   • IntersectionObserver starts full preload 600 px before entry
 ═══════════════════════════════════════════ */
 (function () {
   var video    = document.getElementById('vidScrollPlayer');
@@ -421,7 +424,10 @@
   var headline = document.getElementById('vidHeadline');
   if (!video || !section) return;
 
-  /* Lazy-load: only download when section is near viewport */
+  /* ── Cap: only scrub through the first 5 seconds ── */
+  var VIDEO_SCRUB_MAX = 5; // seconds
+
+  /* ── Preload full data when section is 600 px away ── */
   var _loaded = false;
   function _loadVideo() {
     if (_loaded) return; _loaded = true;
@@ -431,19 +437,41 @@
   if ('IntersectionObserver' in window) {
     var _io = new IntersectionObserver(function(e) {
       if (e[0].isIntersecting) { _loadVideo(); _io.disconnect(); }
-    }, { rootMargin: '400px' });
+    }, { rootMargin: '1200px' });
     _io.observe(section);
   } else { _loadVideo(); }
 
-  /* Decoder warm-up: play a single frame then pause.
-     This primes the hardware decoder so the first scroll seek
-     is instant rather than causing a cold-start stutter.       */
+  /* ── Decoder warm-up: seek to frame 0, prime hardware decoder ── */
   function warmUp() {
+    video.currentTime = 0;
     var p = video.play();
     if (p && p.then) p.then(function () {
-      video.pause();
-      video.currentTime = 0;
-    }).catch(function () {});
+      setTimeout(function () { video.pause(); video.currentTime = 0; }, 80);
+    }).catch(function () { video.currentTime = 0; });
+  }
+
+  /* ── RAF-based lerp for silky seeks ── */
+  var _targetTime = 0;
+  var _currentTime = 0;
+  var _rafScrub = null;
+  var LERP = 0.18; // 0 = instant, 1 = never moves; 0.18 = smooth but responsive
+
+  function scrubLoop() {
+    _currentTime += (_targetTime - _currentTime) * LERP;
+    var diff = Math.abs(_targetTime - _currentTime);
+    if (diff > 0.001) {
+      video.currentTime = _currentTime;
+      _rafScrub = requestAnimationFrame(scrubLoop);
+    } else {
+      video.currentTime = _targetTime;
+      _currentTime = _targetTime;
+      _rafScrub = null;
+    }
+  }
+
+  function seekTo(t) {
+    _targetTime = t;
+    if (!_rafScrub) _rafScrub = requestAnimationFrame(scrubLoop);
   }
 
   function waitGSAP() {
@@ -451,8 +479,11 @@
     gsap.registerPlugin(ScrollTrigger);
 
     function initScrub() {
-      var dur = video.duration;
-      if (!dur || isNaN(dur)) { setTimeout(initScrub, 80); return; }
+      var fileDur = video.duration;
+      if (!fileDur || isNaN(fileDur)) { setTimeout(initScrub, 80); return; }
+
+      /* Clamp scrub range to VIDEO_SCRUB_MAX */
+      var scrubEnd = Math.min(fileDur, VIDEO_SCRUB_MAX);
 
       warmUp();
 
@@ -460,12 +491,12 @@
         trigger: section,
         start:   'top top',
         end:     'bottom bottom',
-        scrub:   0.08,   /* near-zero = tight 1:1; works because all frames are keyframes */
+        scrub:   true,   /* smooth native GSAP scrub */
         onUpdate: function (self) {
           var t = self.progress;
 
-          /* Direct seek — cheap on all-intra video */
-          video.currentTime = t * dur;
+          /* Seek within 0 → scrubEnd, then hold at last frame */
+          seekTo(Math.min(t * scrubEnd, scrubEnd));
 
           /* Scroll hint */
           if (hint) hint.style.opacity = t < 0.03 ? 1 : 0;
