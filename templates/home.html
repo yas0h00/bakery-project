@@ -125,7 +125,6 @@
     <video id="vidScrollPlayer"
            src="{{ url_for('static', filename='videos/0413_1_scrub.mp4') }}"
            muted playsinline preload="none"
-           poster="{{ url_for('static', filename='images/gallery1.jpg') }}"
            disablepictureinpicture
            style="position:relative;z-index:2;display:block;
                   width:100%;height:100%;object-fit:cover;
@@ -422,27 +421,19 @@
   var headline = document.getElementById('vidHeadline');
   if (!video || !section) return;
 
-  /* Lazy-load video only when section is near viewport (within 300px).
-     This prevents the video from blocking page load on mobile/slow connections. */
-  var videoLoaded = false;
-  function loadVideo() {
-    if (videoLoaded) return;
-    videoLoaded = true;
+  /* Lazy-load: only download when section is near viewport */
+  var _loaded = false;
+  function _loadVideo() {
+    if (_loaded) return; _loaded = true;
     video.preload = 'auto';
     video.load();
   }
-
   if ('IntersectionObserver' in window) {
-    var lazyObs = new IntersectionObserver(function(entries) {
-      if (entries[0].isIntersecting) {
-        loadVideo();
-        lazyObs.disconnect();
-      }
-    }, { rootMargin: '300px' });
-    lazyObs.observe(section);
-  } else {
-    loadVideo(); // fallback for old browsers
-  }
+    var _io = new IntersectionObserver(function(e) {
+      if (e[0].isIntersecting) { _loadVideo(); _io.disconnect(); }
+    }, { rootMargin: '400px' });
+    _io.observe(section);
+  } else { _loadVideo(); }
 
   /* Decoder warm-up: play a single frame then pause.
      This primes the hardware decoder so the first scroll seek
