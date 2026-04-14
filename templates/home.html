@@ -124,7 +124,8 @@
     <!-- scroll-driven video -->
     <video id="vidScrollPlayer"
            src="{{ url_for('static', filename='videos/0413_1_scrub.mp4') }}"
-           muted playsinline preload="auto"
+           muted playsinline preload="none"
+           poster="{{ url_for('static', filename='images/gallery1.jpg') }}"
            disablepictureinpicture
            style="position:relative;z-index:2;display:block;
                   width:100%;height:100%;object-fit:cover;
@@ -421,8 +422,27 @@
   var headline = document.getElementById('vidHeadline');
   if (!video || !section) return;
 
-  video.preload = 'auto';
-  video.load();
+  /* Lazy-load video only when section is near viewport (within 300px).
+     This prevents the video from blocking page load on mobile/slow connections. */
+  var videoLoaded = false;
+  function loadVideo() {
+    if (videoLoaded) return;
+    videoLoaded = true;
+    video.preload = 'auto';
+    video.load();
+  }
+
+  if ('IntersectionObserver' in window) {
+    var lazyObs = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        loadVideo();
+        lazyObs.disconnect();
+      }
+    }, { rootMargin: '300px' });
+    lazyObs.observe(section);
+  } else {
+    loadVideo(); // fallback for old browsers
+  }
 
   /* Decoder warm-up: play a single frame then pause.
      This primes the hardware decoder so the first scroll seek
