@@ -8,7 +8,7 @@
 
 ## 📸 Preview
 
-![Swirl & Sprinkle Homepage](https://swirlsprinkle.vercel.app/static/videos/0413_1_scrub.mp4)
+![Swirl & Sprinkle Homepage](https://swirlsprinkle.vercel.app/static/images/cupcake2.png)
 
 ---
 
